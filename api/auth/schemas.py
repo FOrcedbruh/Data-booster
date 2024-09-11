@@ -18,4 +18,4 @@ class UserCreateSchema(BaseModel):
 
 class UserLoginSchema(BaseModel):
     email: str
-    password: str    
+    password: str

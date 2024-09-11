@@ -29,7 +29,9 @@ def validation_password(hashed_password: bytes, password: str) -> bool:
 def RegForm(email: str = Body(), password: str = Body(), firstname: str = Body(), surname: str = Body()) -> UserCreateSchema:
     return UserCreateSchema(
         email=email,
-        password=password
+        password=password,
+        firstname=firstname,
+        surname=surname
     )
 
 def LogForm(email: str = Body(), password: str = Body()) -> UserLoginSchema:

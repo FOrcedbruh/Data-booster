@@ -59,6 +59,7 @@ async def log(response: Response, session: AsyncSession = Depends(db_conn.sessio
 
             response.set_cookie(key="access_token", value=access_token)
 
+        
             return {
                 "status": status.HTTP_200_OK,
                 "user": user

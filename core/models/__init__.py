@@ -1,8 +1,10 @@
 __all__ = (
     "Base",
-    "User"
+    "User",
+    "Contacting"
 )
 
 
 from .base import Base
 from .user import User
+from .contacting import Contacting
