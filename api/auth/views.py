@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Response, HTTPException, status
 from . import utils
-from .schemas import UserSchema, UserCreateSchema
+from .schemas import UserSchema, UserCreateSchema, UserLoginSchema
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.db_conn import db_conn
@@ -12,7 +12,7 @@ from .actions import create_access_token
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/registration")
-async def reg(user_in: UserCreateSchema = Depends(utils.RegForm), session: AsyncSession = Depends(db_conn.session_creation)):
+async def reg(response: Response, user_in: UserCreateSchema = Depends(utils.RegForm), session: AsyncSession = Depends(db_conn.session_creation)):
     st = await session.execute(select(User).filter(User.email == user_in.email))
     candidate = st.scalars().first()
 
@@ -30,15 +30,15 @@ async def reg(user_in: UserCreateSchema = Depends(utils.RegForm), session: Async
 
         access_token = create_access_token(user=user_in)
 
-        Response.set_cookie(key="access_token", value=access_token)
+        response.set_cookie(key="access_token", value=access_token)
 
         return {
             "status": status.HTTP_201_CREATED,
-            "token": access_token
+            "user": user
         }
     
 @router.post("/login")
-async def log(session: AsyncSession = Depends(db_conn.session_creation), user_in: UserCreateSchema = Depends(utils.RegForm)):
+async def log(response: Response, session: AsyncSession = Depends(db_conn.session_creation), user_in: UserLoginSchema = Depends(utils.LogForm)):
     st = await session.execute(select(User).filter(User.email == user_in.email))
     user = st.scalars().first()
     
@@ -57,8 +57,9 @@ async def log(session: AsyncSession = Depends(db_conn.session_creation), user_in
         else:
             access_token = create_access_token(user=user_in)
 
-            Response.set_cookie(key="access_token", value=access_token)
+            response.set_cookie(key="access_token", value=access_token)
 
             return {
-                "status": status.HTTP_200_OK
+                "status": status.HTTP_200_OK,
+                "user": user
             }
